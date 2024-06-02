@@ -8,24 +8,27 @@ from prompts.prompts import SYSTEM_MESSAGE
 from azure_openai import get_completion_from_messages
 import json
 
+
 def query_database(query):
     """ Run SQL query and return results in a dataframe """
     return pd.read_sql_query(query, conn)
+
 
 # Create or connect to SQLite database
 conn = sql_db.create_connection()
 
 # Schema Representation for finances table
 schemas = sql_db.get_schema_representation()
-print(schemas['finances'])
+print(schemas['employees'])
 
 # Format the system message with the schema
-formatted_system_message = SYSTEM_MESSAGE.format(schema=schemas['finances'])
+formatted_system_message = SYSTEM_MESSAGE.format(
+    employees=schemas['employees'], departments=schemas['departments'])
 
 # Generate the SQL query from the user message
-user_message = "Show me all expenses greater than 1000"
+user_message = "Show me all employees in Finance department"
 
-# Use GPT-4 to generate the SQL query
+#  Use GPT-4 to generate the SQL query
 response = get_completion_from_messages(formatted_system_message, user_message)
 json_response = json.loads(response)
 query = json_response['query']
